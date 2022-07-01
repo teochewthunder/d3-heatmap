@@ -54,11 +54,9 @@
                 background-color: rgba(200, 100, 100, 0);
             }
 
-            .hmChartSvg text
+            .hmChartSvg rect
             {
-                fill: rgba(255, 255, 0, 1);
-                text-anchor: middle;
-                font-weight: bold;
+                stroke: rgba(255, 255, 255, 0.2);
             }
 
             .hmFillerSvg
@@ -301,6 +299,24 @@
                 .text(function(d) 
                 {
                     return d;
+                });
+
+                X
+                .selectAll("text")
+                .data(graphData.cols)
+                .enter()
+                .append("text")
+                .attr("x", function(d, i) 
+                {
+                    return ((i * config.dataWidth) + (config.YWidth / 2)) + "em";
+                })
+                .attr("y", function(d) 
+                {
+                    return (config.XHeight / 2) + "em";
+                })
+                .text(function(d) 
+                {
+                    return d.title;
                 });
 
                 for (let r = 0; r <= graphData.rows.length; r++)
