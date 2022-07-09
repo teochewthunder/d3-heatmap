@@ -343,6 +343,12 @@
                     })
                     .attr("fill", function(d) 
                     {
+                        return "rgba(200, 0, 0, 0)";
+                    })
+                    .transition()
+                    .duration(2000)
+                    .attr("fill", function(d) 
+                    {
                         var arr = d.stats.filter((x) => { return x.year == graphData.rows[r];});
 
                         var opacity = 0;
