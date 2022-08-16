@@ -1,46 +1,42 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
-	<head>
-		<title>D3 Heatmap</title>
+    <head>
+        <title>D3 Heatmap</title>
 
-		<style>
+        <style>
             body
             {
                 font-size: 12px;
                 font-family: arial;
-            }    
+            }
 
-            div {outline: 0px solid #FF0000;}
-            
             .hmDashboard
             {
-                height: 3em;
+                height: 2em;
                 width: 100%;
                 text-align: center;
             }
 
             .hmChart
             {
-                width: 100%;
-                height: 100%;
+                outline: 1px solid #000000;
+                background-color: rgba(200, 0, 0, 1);
             }
 
             .hmChartContainer
             {
-                width: 100em;
-                height: 20em;
                 margin: 0 auto 0 auto;
             }
 
-            .hmYSvg
+            .hmLegendYSvg
             {
                 width: 5em;
                 height: 20em;
                 float: left;
-                background-color: rgba(200, 0, 0, 1);
+                background-color: rgba(0, 255, 0, 0);
             }
 
-            .hmYSvg text
+            .hmLegendYSvg text
             {
                 fill: rgba(255, 255, 0, 1);
                 text-anchor: end;
@@ -48,15 +44,16 @@
 
             .hmChartSvg
             {
-                width: 100%;
-                height: 100%;
+                width: 20em;
+                height: 20em;
                 float: left;
-                background-color: rgba(200, 100, 100, 0);
+                background-color: rgba(255, 255, 255, 1);
             }
 
             .hmChartSvg rect
             {
-                stroke: rgba(255, 255, 255, 0.2);
+                stroke: rgba(255, 255, 255, 0);
+                stroke-width: 1;
             }
 
             .hmFillerSvg
@@ -64,29 +61,29 @@
                 width: 5em;
                 height: 3em;
                 float: left;
-                background-color: rgba(200, 0, 0, 1);
+                background-color: rgba(0, 0, 0, 0);
             }
 
-            .hmXSvg
+            .hmLegendXSvg
             {
                 width: 20em;
                 height: 3em;
                 float: left;
-                background-color: rgba(200, 0, 0, 1);
+                background-color: rgba(255, 0, 0, 0);
             }
 
-            .hmXSvg text
+            .hmLegendXSvg text
             {
                 fill: rgba(255, 255, 0, 1);
                 text-anchor: middle;
                 font-weight: bold;
-            }
-		</style>
+            }     
+        </style>
 
-		<script src="https://d3js.org/d3.v4.min.js"></script>
-	</head>
+        <script src="https://d3js.org/d3.v3.min.js"></script>
+    </head>
 
-	<body>
+    <body>
         <div class="hmChartContainer">
             <div class="hmDashboard">
                 <select id="ddlStat">
@@ -95,7 +92,7 @@
             </div>
 
             <div class="hmChart">
-               <svg class="hmYSvg">
+                <svg class="hmLegendYSvg">
 
                 </svg>
 
@@ -109,13 +106,13 @@
 
                 </svg>
 
-                <svg class="hmXSvg">
+                <svg class="hmLegendXSvg">
 
                 </svg>
             </div>
         </div>
 
-		<script>
+        <script>
         var graphData = 
         {
             "cols":
@@ -189,8 +186,8 @@
             "scale": 12,
             "dataWidth": 10,
             "dataSpacing": 2,
-            "YWidth": 10,
-            "XHeight": 4,
+            "legendYWidth": 10,
+            "legendXHeight": 4,
             "max": 0,
             "getChartHeight": function(datalength)
             {
@@ -205,46 +202,43 @@
                 var stat = d3.select("#ddlStat").node().value;
 
                 config.max = d3.max(graphData.cols, function(d) 
-                {
-                    var maxStat = d3.max(d.stats, function(x) 
                     {
-                        return x[stat];
-                    }
-                    );
+                        var maxStat = d3.max(d.stats, function(x) 
+                        {
+                            return x[stat];
+                        }
+                        );
 
-                    return maxStat; 
-                }
+                        return maxStat; 
+                    }
                 );
 
                 var container = d3.select(".hmChartContainer");
                 var wrapper = d3.select(".hmChart");
-                var Y = d3.select(".hmYSvg");
+                var legendY = d3.select(".hmLegendYSvg");
                 var chart = d3.select(".hmChartSvg");
-                var X = d3.select(".hmXSvg");
+                var legendX = d3.select(".hmLegendXSvg");
                 var filler = d3.select(".hmFillerSvg");
 
                 var height = config.getChartHeight(graphData.rows.length);
                 var width = config.getChartWidth(graphData.cols.length);
 
-                var dataSet = graphData.cols;
-                var players = graphData.cols.map((x) => { return x.title });
-
                 container
                 .style("width", function(d) 
                 {
-                    return (width + config.YWidth) + "em";
+                    return (width + config.legendYWidth) + "em";
                 });
 
                 wrapper
                 .style("height", function(d) 
                 {
-                    return (height + config.XHeight) + "em";
+                    return (height + config.legendXHeight) + "em";
                 }); 
 
-                Y
+                legendY
                 .style("width", function(d) 
                 {
-                    return config.YWidth + "em";
+                    return config.legendYWidth + "em";
                 })
                 .style("height", function(d) 
                 {
@@ -263,10 +257,10 @@
                 }) 
                 .html("");
 
-                X
+                legendX
                 .style("height", function(d) 
                 {
-                    return config.XHeight + "em";
+                    return config.legendXHeight + "em";
                 }) 
                 .style("width", function(d) 
                 {
@@ -277,20 +271,21 @@
                 filler
                 .style("width", function(d) 
                 {
-                    return config.YWidth + "em";
+                    return config.legendYWidth + "em";
                 })
                 .style("height", function(d) 
                 {
-                    return config.XHeight + "em";
+                    return config.legendXHeight + "em";
                 });
 
-                Y.selectAll("text")
+                legendY
+                .selectAll("text")
                 .data(graphData.rows)
                 .enter()
                 .append("text")
                 .attr("x", function(d) 
                 {
-                    return (config.YWidth / 2) + "em";
+                    return (config.legendYWidth / 2) + "em";
                 })
                 .attr("y", function(d, i) 
                 {
@@ -301,18 +296,18 @@
                     return d;
                 });
 
-                X
+                legendX
                 .selectAll("text")
                 .data(graphData.cols)
                 .enter()
                 .append("text")
                 .attr("x", function(d, i) 
                 {
-                    return ((i * config.dataWidth) + (config.YWidth / 2)) + "em";
+                    return ((i * config.dataWidth) + (config.dataWidth / 2)) + "em";
                 })
                 .attr("y", function(d) 
                 {
-                    return (config.XHeight / 2) + "em";
+                    return (config.legendXHeight / 2) + "em";
                 })
                 .text(function(d) 
                 {
@@ -322,7 +317,7 @@
                 for (let r = 0; r <= graphData.rows.length; r++)
                 {
                     chart.selectAll("rect.rect_" + graphData.rows[r])
-                    .data(dataSet)
+                    .data(graphData.cols)
                     .enter()
                     .append("rect")
                     .attr("x", function(d, i) 
@@ -346,7 +341,12 @@
                         return "rgba(200, 0, 0, 0)";
                     })
                     .transition()
-                    .duration(2000)
+                    .duration(function(d, i)
+                    {
+                        var opacity = 1000;
+
+                        return opacity * i;                   
+                    })
                     .attr("fill", function(d) 
                     {
                         var arr = d.stats.filter((x) => { return x.year == graphData.rows[r];});
@@ -363,11 +363,10 @@
                         }
 
                         return "rgba(200, 0, 0, " + opacity + ")";
-                    });                    
+                    });             
                 }
-
             }
-        }
+        };
 
         var ddlStat = d3.select("#ddlStat");
 
@@ -391,6 +390,6 @@
         config.setData();
 
         d3.select("#ddlStat").on("change", function() { config.setData(); });
-		</script>
-	</body>
-</html>
+        </script>
+    </body>
+</html> 
